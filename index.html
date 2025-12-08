@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Law of One Tarot</title>
+  <style>
+    /* === DARK THEME STYLE === */
+    :root {
+      --bg-color: #202b38;
+      --card-color: #202b38;
+      --text-color: #e0e6f2; 
+      --accent-color: #ffffff; 
+      --link-color: #3fa8f8;
+      --shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+      
+      --card-radius: 14px;
+      --modal-radius: 6px; 
+      --modal-img-radius: 24px; 
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-y: scroll;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      font-size: 3rem; 
+      padding: 2rem 0 2.5rem 0; 
+      color: var(--accent-color);
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    /* === SCROLL CONTAINER === */
+    .scroll-container {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: #4a5a75 var(--bg-color);
+	  -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;
+    }
+    
+    .scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+    .scroll-container::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background-color: #4a5a75;
+      border-radius: 4px;
+    }
+
+    /* === GRID === */
+    .wrapper {
+      display: grid;
+      grid-template-columns: 60px repeat(7, minmax(110px, 1fr));
+      gap: .5rem; 
+      width: 90%;
+      max-width: 145vh;
+      margin: 0 auto;
+      min-width: 980px; 
+      
+      /* 
+         CENTERING CALCULATION:
+         Label Col (60px) + Gap (1rem/16px) = 76px extra width on left.
+         To center the CARDS visually, shift grid left by half that amount (38px).
+      */
+      transform: translateX(-38px);
+    }
+
+    /* Shared Styles for Labels */
+    .label-col, .label-row {
+      display: flex;
+      justify-content: center; /* Centers horizontally */
+      align-items: center;     /* Centers vertically */
+      font-size: 0.75rem;
+      color: var(--text-color);
+      text-transform: uppercase; /* Forces ALL CAPS */
+      letter-spacing: 1px;
+      font-weight: 600;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Specific Row adjustments (Right aligned against the grid) */
+    .label-row {
+      justify-content: flex-end; 
+      padding-right: 15px;      
+    }
+
+    /* Note: We deleted the separate .label-col rule that was here 
+       so it now uses the shared 'center/center' styles above. */
+
+    /* === DIVIDER === */
+    .grid-divider {
+      grid-column: 2 / -1; 
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 0.8rem 0; 
+      width: 100%;
+    }
+
+    /* === CARD STYLE === */
+    .card {
+      background: var(--card-color);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(202, 162, 69, 0.2);
+      transition: border-color 0.2s ease;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* === MODAL === */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85); 
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-inner {
+      background: var(--card-color);
+      border-radius: var(--modal-radius);
+      padding: 1.5rem;
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      gap: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(202, 162, 69, 0.2);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Close Button (Small X) */
+    .modal-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      color: #ffffff;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.6;
+      font-family: Arial, sans-serif;
+      z-index: 10;
+      user-select: none;
+    }
+    .modal-close-btn:hover {
+      opacity: 1;
+    }
+
+    .modal img {
+      width: 350px;
+      border-radius: var(--modal-img-radius);
+      box-shadow: var(--shadow);
+      object-fit: contain;
+      align-self: flex-start;
+    }
+
+    .modal-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .modal-info h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: var(--accent-color);
+      font-weight: normal; 
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 0.5rem;
+	  padding-top: 1rem;
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+    }
+    
+    .modal-info h3 {
+      margin: 2rem 0 0 0;
+      font-size: 0.85rem;
+      color: var(--text-color);
+      text-transform: uppercase;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    .modal-info p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cfd6e0;
+    }
+
+    .modal-click-close {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .modal-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* === INFO FOOTER === */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+
+    .info-link {
+      color: var(--link-color);
+      text-decoration: none;
+      font-size: 1rem;
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .info-link:hover {
+      opacity: 0.8;
+    }
+
+    /* Info Modal (Text Only) */
+    .text-modal-content {
+      flex-direction: column;
+      max-width: 600px;
+    }
+    
+    .text-modal-content h2 {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+      margin-bottom: 0;
+	  margin-top: 0.7rem;
+      font-size: 1.5rem;
+    }
+	
+	.info-top {
+	  margin-top: 0px;
+	}
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .modal-inner {
+        flex-direction: column;
+        align-items: center;
+      }
+      .modal img {
+        width: 100%;
+        max-width: 300px;
+      }
+      .wrapper {
+        transform: none; /* Reset transform on small screens */
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>The Law of One Tarot</h1>
+
+  <div class="scroll-container">
+    <div class="wrapper" id="deck">
+      <!-- Grid content injected via JS -->
+    </div>
+  </div>
+
+  <div class="footer">
+    <a class="info-link" onclick="openInfoModal()">Information and Resources</a>
+  </div>
+    
+  <!-- Card Detail Modal -->
+  <div class="modal" id="card-modal">
+    <div class="modal-click-close" onclick="closeModal('card-modal')"></div>
+    <div class="modal-inner" id="modal-inner">
+      <div class="modal-close-btn" onclick="closeModal('card-modal')">×</div>
+      <img id="modal-img" src="">
+      <div class="modal-info">
+        <h2 id="modal-header-text"></h2>
+        <h3 id="modal-title-text"></h3> 
+        <p id="modal-desc"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info / Resources Modal -->
+  <div class="modal" id="info-modal">
+    <div class="modal-click-close" onclick="closeModal('info-modal')"></div>
+    <div class="modal-inner text-modal-content">
+      <div class="modal-close-btn" onclick="closeModal('info-modal')">×</div>
+      <h2>Information and Resources</h2>
+      <div class="modal-info">
+        <p class="info-top"><strong>Tarot According to the Law of One</strong><br>
+        The Tarot images presented here represent the archetypical mind as described in the Law of One material (The Ra Contact). These images are based on the original Falconnier & Wegener drawings (1896) and were adjusted slightly to align more closely with the original intention of the archetypes as described by Ra. A special thank you to Claire Dartez for the descriptions of symbols from their book “The Tarot According to Ra” which I highly recommend reading after first working with these archetypes alone as is advised in The Law of One.</p>
+		
+		<p>
+        You can find the Brotherhood of Light Tarot originally used by Don, Jim, and Carla in the Ra Contact here:
+        <a href="https://www.thirddensity.com/tarot/" target="_blank" style="color: var(--link-color); text-decoration: none;">www.thirddensity.com</a></p>
+        
+		<p>
+        For the complete transcripts and search tools, please visit:
+        <a href="https://www.lawofone.info/" target="_blank" style="color: var(--link-color); text-decoration: none;">www.lawofone.info</a></p>
+        
+        <p><em>“To the student the tarot images offer a resource for learn/teaching the processes of evolution.”</em><br>- Ra</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* === TAROT CARD DATA === */
+const cards = [
+  {id:1, section:"Matrix of the Mind", title:"The Magician", img:"images/tarot_1.jpg", desc:"A male figure, wearing all white, holds a magical orb in his right hand and points to a box with his left. He wears a gold circlet on his head and an ouroboros around his waist. The box has thick, dark walls and cages a flightless bird. The bottom of the box has a checkered pattern."},
+  {id:2, section:"Potentiator of the Mind", title:"The High Priestess", img:"images/tarot_2.jpg", desc:"A female figure sits atop a box set between two pillars. Her face is covered by a veil, her right side is covered by a shawl with fruit printed on it, her body is covered by a dress, and on her chest is the ankh or crux ansata. The pillar on her right is white (or red) and the pillar on her left is black, but the same image is printed on each, and the crux ansata is notably present in that image."},
+  {id:3, section:"Catalyst of the Mind", title:"The Empress", img:"images/tarot_3.jpg", desc:"A female figure sits atop a box, facing to her left, with her feet resting on a crescent moon. She wears a transparent blouse and on her head rests crown and a ureaus. She holds an orb in her right hand, while a bird begins to take flight from her left. Behind her the sun shines, while beneath her eyes open within a box that is neither black nor white."},
+  {id:4, section:"Experience of the Mind", title:"The Emperor", img:"images/tarot_4.jpg", desc:"A male figure wears a crown and a uraeus on its head, its body covered in a garment that extends further on the figure’s left than on his right. On his chest is emblazoned a bird in flight within a circle. His legs form a cross with one toe touching the ground, and in his right hand is a magical orb while his left hand is held palm-down and empty. The figure sits atop a box within which a house cat sits on the right side, facing the left side."},
+  {id:5, section:"Significator of the Mind", title:"The Hierophant", img:"images/tarot_5.jpg", desc:"A human male figure is attached at the hips to a box. He sits within a larger structure consisting of a foundation, pillars, and a roof. Above the structure there is a winged orb, and on the base of the structure, there are 8 cartouches which communicate a message that, according to Ra, is equivalent to “And you shall be born again to eternal life.” At the right and left of the central figure, there are two smaller human figures who hold their hands up to the central figure as if to offer something. The one on the central figure’s left is white and the one on the central figure’s right is black. The central figure wears a crown, makes a gesture of blessing with his right hand, and holds a sword planted in the foundation of the structure with his left."},
+  {id:6, section:"Transformation of the Mind", title:"The Two Paths", img:"images/tarot_6.jpg", desc:"A man stands in the center with a woman on each side of him. His arms are crossed in front of him as he holds a hand of each woman. The women point in opposite directions and the ground beneath them lays out two diverging paths to follow. The woman on the man’s right is modestly dressed and wears a uraeus on her head, while the woman on the man’s left is exposed and wears grapes on her head. Above them, a genie draws an arrow aimed at the path on the man’s left."},
+  {id:7, section:"Great Way of the Mind", title:"The Chariot", img:"images/tarot_7.jpg", desc:"A male human figure stands inside of a cubic chariot whose roof is held up by four pillars. At the top of the roof in the front of the chariot, a veil hangs lower on the figure’s left side than his right. On the front of the chariot there is a winged orb and on the sides there are wheels to allow the chariot to move. On his head is a helm and a uraeus, on his chest there are two mirrored right angles above a tau. In his right hand he holds a glowing orb and in his left a sword turned downward. Two sphinxes pull the chariot forward, a black one on the right and a white one on the left. Each sphinx has one front limb straight as if to walk and the other bent as if to rest."},
+
+  {id:8, section:"Matrix of the Body", title:"Balance", img:"images/tarot_8.jpg", desc:"A human female figure wearing black and white stripes is seated on a sturdy throne, her feet resting on a pedestal. She is blindfolded and wears an iron crown with a uraeus. In her right hand she holds a sword and in her left she holds a balanced scale. Behind her stands a messenger bearing the feather of Ma’at. Above her there is a flying winged turtle and a canopy. Next to her a sphinx walks atop a walking lion."},
+  {id:9, section:"Potentiator of the Body", title:"Wisdom", img:"images/tarot_9.jpg", desc:"A human male figure stands with a walking stick in his right hand and a lamp in his left. He wears a square cape or cloak that partially hides the light of the lamp. He faces his own left and in front of him crawl two serpents, each wearing one of the two primary Egyptian crowns."},
+  {id:10, section:"Catalyst of the Body", title:"The Wheel of Fortune", img:"images/tarot_10.jpg", desc:"A wheel is held in place by two columns, at whose base there is a winged orb and two snakes rising on either side. The wheel has an inner ring and an outer ring, held together by eight spokes. On the left side of the wheel, Typhon or Set, an emblem of darkness, curses, depravity, decay, disruption, cruelty, and general vice rides the gravitational swing of the wheel downward. On the right side of the wheel, Hermanubis, an emblem of human ingenuity, forthrightness, prosperity, and general virtue climbs the turning wheel upward. Above the wheel there is a circular platform on which stands a sphinx with a spear aimed at the right side of the wheel, just beyond Hermanubis."},
+  {id:11, section:"Experience of the Body", title:"The Enchantress", img:"images/tarot_11.jpg", desc:"A human female figure stands facing to her right, wearing a long and heavy dress. In front of her stands a lion with its mouth open. With her right hand on the lions nose and her left hand under the lion’s chin, she closes its mouth. She wears a uraeus and a crown on her head. Atop the crown, there is a pitcher and a bird."},
+  {id:12, section:"Significator of the Body", title:"The Martyr", img:"images/tarot_12.jpg", desc:"A man hangs by his right foot from a branch held up by two limbless trees. His left foot hangs, crossing his right at a 90 degree angle. His hands are bound together over his head, dropping four coins on the ground below. Fruit-yielding vines grow up both trees, but each vine remains on its own side, without contacting the other side."},
+  {id:13, section:"Transformation of the Body", title:"Death", img:"images/tarot_13.jpg", desc:"A skeleton uses a scythe to reap human hands, feet, and heads (both masculine and feminine). The skeleton faces its left, and behind the skeleton there is a rainbow."},
+  {id:14, section:"Great Way of the Body", title:"The Alchemist", img:"images/tarot_14.jpg", desc:"An androgynous human figure with wings on their back and feet stands facing to their left. The figure holds a silver cup (or pitcher) in their left hand and a gold in their left, pouring liquid from the silver into the gold. The figure is clad only in a sash draped over the left shoulder. Behind the figure’s head, the sun shines, and above their head there is a tongue of fire."},
+
+  {id:15, section:"Matrix of the Spirit", title:"Primeval Darkness", img:"images/tarot_15.jpg", desc:"Typhon stands in the center, trampling two broken pillars. Typhon has a crocodile head, a rhinoceros horn, bat wings, a pig’s body, cloven feet, breasts, an erect penis, a snake emerging from the navel, a scepter in the right hand, and a torch pointing toward the ground in the left. In front of Typhon two human figures, one male and one female, kneel with one knee down and one up. They each wear a goat’s head mask and a loincloth, and they are chained together at the neck. One points up and the other points down."},
+  {id:16, section:"Potentiator of the Spirit", title:"Lightning", img:"images/tarot_16.jpg", desc:"A tower or pyramid is being struck by lightning. The capstone or battlement on top is dislodged and falling off. Two figures fall from the top, one male and one female."},
+  {id:17, section:"Catalyst of the Spirit", title:"Faith", img:"images/tarot_17.jpg", desc:"A naked woman kneels with her right foot on land and her left foot on sea, her legs forming right angles. Her right hand pours liquid from a pitcher onto the land and her left pours liquid from a pitcher into the sea. She faces to her own left, while behind her a stem with three blossoms grows with a butterfly above it. Above her, a bright star shines with a white triangle above an inverted black triangle in the center of the star. Seven smaller stars surround the central star."},
+  {id:18, section:"Experience of the Spirit", title:"The Moon", img:"images/tarot_18.jpg", desc:"Two pyramids rise on either side of the scene, white pyramid on the left, black pyramid on the right. The white pyramid has a door, while the black pyramid does not. Between and above the pyramids, there is a moon in the night sky, obscured by clouds or mist. In front of the pyramids are two jackals facing each other, a black jackal on the left, white on the right. At the bottom of the scene, a scorpion crawls toward the black jackal and the white pyramid, enveloped by a circle of light."},
+  {id:19, section:"Significator of the Spirit", title:"The Sun", img:"images/tarot_19.jpg", desc:"A man and a woman stand in the center of a ring of flowers, man to the right of the woman and woman to the left of the man. They hold hands and look into each other’s eyes. On the man’s chest a bird in flight is emblazoned; while on the woman’s chest an ankh is emblazoned. Above them, the Sun shines brightly, with a lingham-yoni (sexual union) symbol inside it. The two figures are clothed, but only lightly. They are youthful in their physical appearance."},
+  {id:20, section:"Transformation of the Spirit", title:"The Sarcophagus", img:"images/tarot_20.jpg", desc:"Three human figures emerge from an open sarcophagus, all of them wrapped tightly in burial cloth so that their limbs are immobile. The first to emerge is male, the second is female, and the third is a child. In the top left corner (from the perspective of the figures, top right from the perspective of the viewer) a winged figure with a tongue of fire above its head sounds a trumpet toward the lower right corner. Rays of light emanate from the trumpeter. In most older versions of this image, a square banner with a cross on it hangs from the trumpet. A scarab beetle adorns the sarcophagus."},
+  {id:21, section:"Great Way of the Spirit", title:"The World", img:"images/tarot_21.jpg", desc:"A kneeling woman dressed in white plays a three-stringed harp. Above her a conjoined lingham yoni with wings soars in the sky. Around the lingam yoni there is a wreath of flowers, surrounded by the heads of the four creatures of the sphinx: human, lion, bull, eagle. In the Zain and Fatham images, the harp has the crowned head of a man on it; however, in the Falconnier-Wegener and Saint Germain images, the harp does not have this addition. I prefer the addition of the male head, but I admit it may not have been part of the original image as given by Ra."},
+
+  {id:22, section:"The Choice", title:"The Choice", img:"images/tarot_22.jpg", desc:"A blindfolded human figure walks toward the ocean. A crocodile with mouth open awaits the approach of the figure. The figure walks forward next to a fallen column with writing on it. There is a solar eclipse overhead. The figure carries two bags on their left shoulder, one bag in front and one behind. In their right hand is a black walking stick. The figure is only partially clothed."}
+];
+
+/* === LABELS === */
+const rowLabels = ["Mind", "Body", "Spirit"];
+const colLabels = ["Matrix", "Potentiator", "Catalyst", "Experience", "Significator", "Transformation", "Great Way"];
+
+const deckElem = document.getElementById("deck");
+
+/* 1. Insert Top Row (Column Labels) */
+deckElem.append(document.createElement("div")); // Top-left blank
+colLabels.forEach(text => {
+  let el = document.createElement("div");
+  el.className = "label-col";
+  el.textContent = text;
+  deckElem.append(el);
+});
+
+/* 2. Insert Main Grid (Rows 1-3) */
+let cardIndex = 0;
+rowLabels.forEach((row) => {
+  // Row Label
+  let rl = document.createElement("div");
+  rl.className = "label-row";
+  rl.textContent = row;
+  deckElem.append(rl);
+
+  // 7 cards of this row
+  for (let i = 0; i < 7; i++) {
+    const card = cards[cardIndex++];
+    const cardEl = createCardElement(card);
+    deckElem.append(cardEl);
+  }
+});
+
+/* 3. Insert Divider (Columns 2 to End) */
+const divider = document.createElement("div");
+divider.className = "grid-divider";
+deckElem.append(divider);
+
+/* 4. Insert The Choice (Row Label + Card 22) */
+const choiceLabel = document.createElement("div");
+choiceLabel.className = "label-row";
+choiceLabel.textContent = "The Choice";
+deckElem.append(choiceLabel);
+
+deckElem.append(createCardElement(cards[21])); 
+
+
+/* === HELPER FUNCTIONS === */
+
+function createCardElement(card) {
+  const el = document.createElement("div");
+  el.className = "card";
+  el.innerHTML = `<img src="${card.img}" alt="${card.title}">`;
+  el.addEventListener("click", () => showCardModal(card));
+  return el;
+}
+
+/* === MODAL LOGIC === */
+const cardModal = document.getElementById("card-modal");
+const infoModal = document.getElementById("info-modal");
+
+// Elements inside the Card Modal
+const modalImg = document.getElementById("modal-img");
+const modalHeader = document.getElementById("modal-header-text"); // The H2 (Section)
+const modalTitleText = document.getElementById("modal-title-text"); // The H3 (Title)
+const modalDesc = document.getElementById("modal-desc"); // The P (Description)
+
+function showCardModal(card) {
+  modalImg.src = card.img;
+  
+  // 1. Set the top header (The Section, e.g., "1. Matrix of the Mind")
+  modalHeader.textContent = `${card.id}. ${card.section}`;
+
+  // 2. Set the bottom header (The Name, e.g., "THE MAGICIAN")
+  if(modalTitleText) {
+    modalTitleText.textContent = card.title;
+  }
+  
+  // 3. Set the description
+  modalDesc.textContent = card.desc || "Symbolism description coming soon...";
+  
+  // 4. Show the modal
+  cardModal.classList.add("active");
+}
+
+function openInfoModal() {
+  infoModal.classList.add("active");
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove("active");
+}
+</script>
+
+</body>
+</html>
