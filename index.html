@@ -267,31 +267,50 @@
 	  margin-top: 0px;
 	}
 
-    /* Mobile adjustments */
+/* Mobile / Tablet adjustments */
     @media (max-width: 1024px) {
-      .modal-inner {
-        flex-direction: column;
-        align-items: center;
-      }
-      .modal img {
-        width: 100%;
-        max-width: 300px;
-      }
+      
+      /* 1. Grid Alignment fixes for mobile */
       .wrapper {
-        /* 1. Stop shifting the grid to the left on smaller screens */
         transform: none; 
-        
-        /* 2. Add padding so the "The Choice" label has room and isn't cut off */
         padding-left: 10px; 
-        
-        /* Optional: Ensure the container doesn't force a huge scroll width on mobile */
         width: auto;
       }
       
-      /* Optional: Tighten the label text slightly on very small screens if needed */
       .label-row {
         font-size: 0.7rem; 
         padding-right: 5px;
+      }
+
+      /* 2. MODAL: Force Side-by-Side Layout */
+      .modal-inner {
+        flex-direction: row; /* Keeps image and text side-by-side */
+        align-items: flex-start; /* Aligns them to the top */
+        gap: 1rem; /* Reduces the gap so they fit better */
+        padding: 1rem; /* Reduces padding for more space */
+      }
+
+      /* 3. MODAL IMAGE: Make it responsive */
+      .modal img {
+        /* Instead of a fixed pixel width, use percentage */
+        width: 40%; 
+        max-width: 300px; /* Don't let it get huge on tablets */
+        min-width: 120px; /* Don't let it get microscopic on small phones */
+        height: auto;
+      }
+      
+      /* 4. Text adjustments for small spaces */
+      .modal-info h2 {
+        font-size: 1.1rem; /* Slightly smaller header */
+      }
+      
+      .modal-info h3 {
+        margin-top: 1rem; /* Tighter spacing */
+        font-size: 0.75rem;
+      }
+      
+      .modal-info p {
+        font-size: 0.85rem; /* Readable but compact body text */
       }
     }
 
