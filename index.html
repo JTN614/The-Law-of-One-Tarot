@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Law of One Tarot</title>
   <style>
     /* === DARK THEME STYLE === */
@@ -270,47 +271,45 @@
 /* Mobile / Tablet adjustments */
     @media (max-width: 1024px) {
       
-      /* 1. Grid Alignment fixes for mobile */
+      /* 1. Fix the main grid on mobile */
       .wrapper {
         transform: none; 
-        padding-left: 10px; 
+        padding-left: 10px; /* Gives "The Choice" label some breathing room */
         width: auto;
       }
       
-      .label-row {
-        font-size: 0.7rem; 
-        padding-right: 5px;
-      }
-
-      /* 2. MODAL: Force Side-by-Side Layout */
+      /* 2. FORCE the Modal to stay Side-by-Side */
       .modal-inner {
-        flex-direction: row; /* Keeps image and text side-by-side */
-        align-items: flex-start; /* Aligns them to the top */
-        gap: 1rem; /* Reduces the gap so they fit better */
-        padding: 1rem; /* Reduces padding for more space */
+        flex-direction: row !important; /* Forces side-by-side */
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
       }
 
-      /* 3. MODAL IMAGE: Make it responsive */
+      /* 3. Image sizing for mobile */
       .modal img {
-        /* Instead of a fixed pixel width, use percentage */
-        width: 40%; 
-        max-width: 300px; /* Don't let it get huge on tablets */
-        min-width: 120px; /* Don't let it get microscopic on small phones */
+        width: 40%; /* Image takes 40% of width */
+        min-width: 120px; /* Never gets smaller than this */
+        max-width: 250px; 
         height: auto;
+        /* Fix for the flashing image issue */
+        transition: opacity 0.2s ease;
       }
       
-      /* 4. Text adjustments for small spaces */
+      /* 4. Text sizing for mobile */
       .modal-info h2 {
-        font-size: 1.1rem; /* Slightly smaller header */
+        font-size: 1.1rem;
+        margin-top: 0;
+        padding-top: 0;
       }
       
       .modal-info h3 {
-        margin-top: 1rem; /* Tighter spacing */
+        margin-top: 0.5rem;
         font-size: 0.75rem;
       }
       
       .modal-info p {
-        font-size: 0.85rem; /* Readable but compact body text */
+        font-size: 0.85rem;
       }
     }
 
