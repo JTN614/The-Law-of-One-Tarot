@@ -14,7 +14,7 @@
       --link-color: #3fa8f8;
       --shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
       
-      --card-radius: 14px;
+      --card-radius: 12px;
       --modal-radius: 6px; 
       --modal-img-radius: 24px; 
     }
@@ -268,6 +268,11 @@
     /* === MOBILE / TABLET ADJUSTMENTS === */
   @media (max-width: 1024px) {
       
+	  :root {
+        --card-radius: 10px;
+        --modal-img-radius: 12px;
+      }
+	  
       /* 1. Scale down Title */
       h1 {
         font-size: 1.8rem; 
@@ -278,7 +283,8 @@
       .wrapper {
         transform: none; 
         padding-left: 5px; 
-        width: auto;
+        width: 98%;
+        max-width: 100%; 
         min-width: 0; /* Resets the desktop min-width */
         
         /* Grid Size: Label Width | Card Width */
